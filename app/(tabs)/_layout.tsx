@@ -1,35 +1,45 @@
+import { Colors } from '@/src/theme/Theme';
+import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import React from 'react';
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+    return (
+        <Tabs
+            screenOptions={({ route }) => ({
+                headerShown: false,
+                tabBarActiveTintColor: Colors.neutral.white,
+                tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.5)',
+                tabBarStyle: {
+                    borderTopColor: Colors.primary.deep,
+                    backgroundColor: Colors.primary.deep,
+                    height: 60,
+                    paddingBottom: 8,
+                    paddingTop: 8,
+                },
+                tabBarIcon: ({ focused, color, size }) => {
+                    let iconName: keyof typeof Ionicons.glyphMap;
 
-  return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
-    </Tabs>
-  );
+                    if (route.name === 'index') {
+                        iconName = focused ? 'home' : 'home-outline';
+                    } else if (route.name === 'appointments') {
+                        iconName = focused ? 'calendar' : 'calendar-outline';
+                    } else if (route.name === 'video') {
+                        iconName = focused ? 'videocam' : 'videocam-outline';
+                    } else if (route.name === 'profile') {
+                        iconName = focused ? 'person' : 'person-outline';
+                    } else {
+                        iconName = 'help-circle';
+                    }
+
+                    return <Ionicons name={iconName} size={size} color={color} />;
+                },
+            })}
+        >
+            <Tabs.Screen name="index" options={{ title: 'Hjem' }} />
+            <Tabs.Screen name="appointments" options={{ title: 'Timer' }} />
+            <Tabs.Screen name="video" options={{ title: 'Video' }} />
+            <Tabs.Screen name="profile" options={{ title: 'Profil' }} />
+        </Tabs>
+    );
 }
