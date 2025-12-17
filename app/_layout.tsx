@@ -1,3 +1,4 @@
+import { AuthProvider } from '@/src/context/AuthContext';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { Stack } from 'expo-router/stack';
 import { StatusBar } from 'expo-status-bar';
@@ -8,11 +9,13 @@ export default function RootLayout() {
         <SafeAreaProvider>
             <ActionSheetProvider>
                 <>
-                    <Stack screenOptions={{ headerShown: false }}>
-                        <Stack.Screen name="index" />
-                        <Stack.Screen name="login" />
-                        <Stack.Screen name="(tabs)" />
-                    </Stack>
+                    <AuthProvider>
+                        <Stack screenOptions={{ headerShown: false }}>
+                            <Stack.Screen name="index" />
+                            <Stack.Screen name="login" />
+                            <Stack.Screen name="(tabs)" />
+                        </Stack>
+                    </AuthProvider>
                     <StatusBar style="auto" />
                 </>
             </ActionSheetProvider>

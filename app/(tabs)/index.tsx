@@ -1,16 +1,17 @@
+import { useAuth } from '@/src/context/AuthContext';
 import { Colors, Spacing } from '@/src/theme/Theme';
 import { Body, H2, H3 } from '@/src/theme/Typography';
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
 export default function DashboardScreen() {
     const router = useRouter();
+    const { user } = useAuth();
     const [selectedTab, setSelectedTab] = useState('Lege');
 
     // Handle Tab Press
@@ -29,7 +30,7 @@ export default function DashboardScreen() {
 
                 {/* Header Section */}
                 <View style={styles.headerCentered}>
-                    <Body style={styles.greeting}>Hei, Ola Nordmann 👋</Body>
+                    <Body style={styles.greeting}>Hei, {user?.name || 'Gjest'} 👋</Body>
                     <H2 style={styles.mainQuestion}>Hva kan vi hjelpe deg med?</H2>
                 </View>
 
@@ -116,7 +117,7 @@ const ServiceCard = ({ title, subtitle, image, buttonText, onPress, variant = 's
     { title: string, subtitle: string, image: any, buttonText: string, onPress?: () => void, variant?: 'sage' | 'light' }) => (
     <View style={[styles.card, variant === 'light' && styles.cardLight]}>
         <View style={styles.cardImageContainer}>
-            <Image source={image} style={[styles.cardImage, variant === 'light' && { opacity: 0.8 }]} contentFit="contain" />
+            <Image source={image} style={[styles.cardImage, variant === 'light' && { opacity: 0.8 }]} resizeMode="contain" />
         </View>
         <View style={styles.cardContent}>
             <H3 style={[styles.cardTitle, variant === 'sage' && { color: Colors.neutral.white }]}>{title}</H3>

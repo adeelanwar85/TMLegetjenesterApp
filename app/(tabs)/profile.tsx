@@ -1,21 +1,69 @@
+import { useAuth } from '@/src/context/AuthContext';
 import { Colors, Spacing } from '@/src/theme/Theme';
 import { Body, H2, H3 } from '@/src/theme/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Switch, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Alert, Platform, ScrollView, StyleSheet, Switch, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ProfileScreen() {
     const router = useRouter();
+    const { user, logout, enableBiometrics, hasBiometrics } = useAuth();
     const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-    const [faceIdEnabled, setFaceIdEnabled] = useState(true);
+    const [faceIdEnabled, setFaceIdEnabled] = useState(false);
 
-    const handleLogout = () => {
+    useEffect(() => {
+        if (hasBiometrics !== undefined) {
+            setFaceIdEnabled(hasBiometrics);
+        }
+    }, [hasBiometrics]);
+
+    const handleLogout = async () => {
+        if (Platform.OS === 'web') {
+            const confirm = window.confirm('Er du sikker på at du vil logge ut?');
+            if (confirm) {
+                await logout();
+                router.replace('/');
+            }
+            return;
+        }
+
         Alert.alert('Logg ut', 'Er du sikker på at du vil logge ut?', [
             { text: 'Avbryt', style: 'cancel' },
-            { text: 'Logg ut', style: 'destructive', onPress: () => router.replace('/login') },
+            {
+                text: 'Logg ut',
+                style: 'destructive',
+                onPress: async () => {
+                    await logout();
+                    router.replace('/');
+                }
+            },
         ]);
+    };
+
+    const toggleFaceId = async (value: boolean) => {
+        if (value) {
+            const success = await enableBiometrics();
+            if (success) {
+                setFaceIdEnabled(true);
+                Alert.alert('FaceID / TouchID', 'Biometri er aktivert for neste innlogging.');
+            } else {
+                setFaceIdEnabled(false);
+            }
+        } else {
+            setFaceIdEnabled(false);
+        }
+    };
+
+    // Helper to get initials
+    const getInitials = (name?: string) => {
+        if (!name) return 'ON';
+        const parts = name.trim().split(/\s+/); // Split by any whitespace and trim
+        if (parts.length >= 2) {
+            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        }
+        return name.slice(0, 2).toUpperCase();
     };
 
     return (
@@ -25,10 +73,11 @@ export default function ProfileScreen() {
                 {/* User Header */}
                 <View style={styles.header}>
                     <View style={styles.avatar}>
-                        <H2 style={styles.avatarText}>ON</H2>
+                        <H2 style={styles.avatarText}>{getInitials(user?.name)}</H2>
                     </View>
-                    <H2 style={styles.name}>Ola Nordmann</H2>
-                    <Body style={styles.idText}>Fødselsdato: 12.03.1985</Body>
+                    <H2 style={styles.name}>{user?.name || 'Ola Nordmann'}</H2>
+                    <Body style={styles.idText}>Fødselsdato: {user?.birthdate || '12.03.1985'}</Body>
+                    <Body style={styles.idText}>{user?.phone}</Body>
                 </View>
 
                 {/* Min Helse Section */}
@@ -51,15 +100,23 @@ export default function ProfileScreen() {
                         title="FaceID / TouchID"
                         isSwitch
                         switchValue={faceIdEnabled}
-                        onSwitchChange={setFaceIdEnabled}
+                        onSwitchChange={toggleFaceId}
                         last
                     />
                 </Section>
 
                 {/* Om Appen Section */}
                 <Section title="Om Appen">
-                    <MenuItem icon="shield-checkmark-outline" title="Personvern" onPress={() => { }} />
-                    <MenuItem icon="document-outline" title="Vilkår" onPress={() => { }} />
+                    <MenuItem
+                        icon="shield-checkmark-outline"
+                        title="Personvern"
+                        onPress={() => router.push({ pathname: '/legal', params: { type: 'privacy' } })}
+                    />
+                    <MenuItem
+                        icon="document-outline"
+                        title="Vilkår"
+                        onPress={() => router.push({ pathname: '/legal', params: { type: 'terms' } })}
+                    />
                     <MenuItem icon="help-circle-outline" title="Hjelp og støtte" onPress={() => { }} last />
                 </Section>
 
@@ -105,12 +162,8 @@ function MenuItem({
     switchValue?: boolean,
     onSwitchChange?: (val: boolean) => void
 }) {
-    return (
-        <TouchableOpacity
-            style={[styles.menuItem, last && styles.menuItemLast]}
-            onPress={isSwitch ? undefined : onPress}
-            activeOpacity={isSwitch ? 1 : 0.7}
-        >
+    const content = (
+        <>
             <View style={styles.menuItemLeft}>
                 <View style={styles.iconContainer}>
                     <Ionicons name={icon} size={22} color={Colors.primary.deep} />
@@ -127,6 +180,24 @@ function MenuItem({
             ) : (
                 <Ionicons name="chevron-forward" size={20} color={Colors.neutral.darkGray} style={{ opacity: 0.5 }} />
             )}
+        </>
+    );
+
+    if (isSwitch) {
+        return (
+            <View style={[styles.menuItem, last && styles.menuItemLast]}>
+                {content}
+            </View>
+        );
+    }
+
+    return (
+        <TouchableOpacity
+            style={[styles.menuItem, last && styles.menuItemLast]}
+            onPress={onPress}
+            activeOpacity={0.7}
+        >
+            {content}
         </TouchableOpacity>
     );
 }
