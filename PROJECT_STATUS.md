@@ -20,11 +20,13 @@ This is a React Native (Expo) app for "TM Legetjenester", a medical clinic in No
 ### 3. User Profile
 *   **Data Display**: Shows registered name, birthdate, phone.
 *   **Settings**: Toggles for Notifications and FaceID (Mocked on web).
-*   **Legal**: Native "Personvern" and "Vilkår" screens (`app/legal.tsx`), accessible via generic links in Profile and Registration footer.
+*   **Legal**: Native "Personvern" and "Vilkår" screens (`app/legal.tsx`).
+*   **About**: Native "Om oss" screen (`app/about.tsx`) with clinic info and contact actions.
 *   **Logout**: Secure logout clears local storage and redirects to Welcome screen (`/`).
 
 ### 4. UI/UX
-*   **Design System**: Custom `Theme.ts` with TM Legetjenester colors (Sage Green, Deep Green, etc.).
+*   **Design System**: Custom `Theme.ts` with TM Legetjenester colors.
+*   **Branding**: Custom App Icon and Splash Screen (Sage Green theme).
 *   **Assets**: TM Logo implemented on Login and Welcome screens.
 *   **Illustrations**: Custom health illustrations in Dashboard.
 

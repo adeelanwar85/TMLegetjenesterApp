@@ -92,7 +92,7 @@ export default function DashboardScreen() {
                     />
 
                     {/* Information Link Card */}
-                    <TouchableOpacity style={styles.infoCard} onPress={() => router.push({ pathname: '/webview', params: { url: 'https://tmlegetjenester.no/om-oss/', title: 'Om Oss' } })}>
+                    <TouchableOpacity style={styles.infoCard} onPress={() => router.push('/about')}>
                         <View style={styles.infoIcon}>
                             <Ionicons name="information-circle-outline" size={24} color={Colors.primary.dark} />
                         </View>
@@ -115,7 +115,11 @@ export default function DashboardScreen() {
 
 const ServiceCard = ({ title, subtitle, image, buttonText, onPress, variant = 'sage' }:
     { title: string, subtitle: string, image: any, buttonText: string, onPress?: () => void, variant?: 'sage' | 'light' }) => (
-    <View style={[styles.card, variant === 'light' && styles.cardLight]}>
+    <TouchableOpacity
+        style={[styles.card, variant === 'light' && styles.cardLight]}
+        onPress={onPress}
+        activeOpacity={0.9}
+    >
         <View style={styles.cardImageContainer}>
             <Image source={image} style={[styles.cardImage, variant === 'light' && { opacity: 0.8 }]} resizeMode="contain" />
         </View>
@@ -125,11 +129,11 @@ const ServiceCard = ({ title, subtitle, image, buttonText, onPress, variant = 's
 
             {/* Price section removed as requested */}
 
-            <TouchableOpacity style={[styles.cardButton, variant === 'sage' ? styles.cardButtonSage : styles.cardButtonLight]} onPress={onPress}>
+            <View style={[styles.cardButton, variant === 'sage' ? styles.cardButtonSage : styles.cardButtonLight]}>
                 <Text style={[styles.cardButtonText, variant === 'sage' ? { color: Colors.primary.dark } : { color: Colors.primary.dark }]}>{buttonText}</Text>
-            </TouchableOpacity>
+            </View>
         </View>
-    </View>
+    </TouchableOpacity>
 );
 
 const styles = StyleSheet.create({

@@ -108,6 +108,11 @@ export default function ProfileScreen() {
                 {/* Om Appen Section */}
                 <Section title="Om Appen">
                     <MenuItem
+                        icon="information-circle-outline"
+                        title="Om oss"
+                        onPress={() => router.push('/about')}
+                    />
+                    <MenuItem
                         icon="shield-checkmark-outline"
                         title="Personvern"
                         onPress={() => router.push({ pathname: '/legal', params: { type: 'privacy' } })}
